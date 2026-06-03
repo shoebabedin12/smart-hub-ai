@@ -1,14 +1,8 @@
-# smart-hub-ai
-"# smart-hub-ai" 
-
-#### Git Bash
-
-```bash
-source venv/Scripts/activate
-```
-
-## 📦 Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
+---
+title: Smart Hub Db
+emoji: 🐳
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+---
