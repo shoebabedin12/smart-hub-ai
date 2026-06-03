@@ -1,12 +1,9 @@
 flask
 flask-cors
-pymysql
+requests
 sentence-transformers
-faiss-cpu
 numpy
-python-dotenv
+faiss-cpu
 pymupdf
 python-docx
-google-generativeai
-fastapi
-uvicorn[standard]
+gunicorn
