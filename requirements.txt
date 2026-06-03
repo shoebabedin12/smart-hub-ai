@@ -1,6 +1,6 @@
 flask
 flask-cors
-psycopg2-binary
+pymysql
 sentence-transformers
 faiss-cpu
 numpy

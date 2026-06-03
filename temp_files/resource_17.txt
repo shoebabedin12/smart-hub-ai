@@ -1,0 +1,25 @@
+OPERATING SYSTEM LAB-1
+Assignment 1.1 - Write the definition of Operating System.
+
+Answer:
+An operating system (OS) is the program that, after being initially loaded into the computer by a boot program, manages all of the other application programs in a computer. The application programs make use of the operating system by making requests for services through a defined application program interface (API). In addition, users can interact directly with the operating system through a user interface, such as a command-line interface (CLI) or a graphical UI (GUI).
+
+Examples of Operating Systems:
+- Windows
+- Linux
+- Mac-os
+- Android
+- Ios
+- Symbian
+
+Assignment 1.2 - Write the process of installing Linux OS.
+
+Answer:
+The process of installing Linux OS involves setting up a virtual environment before direct installation.
+
+Tools Used for Installation:
+1. Linuxmint-21.2-cinnamon-64bit.iso
+2. VirtualBox-7.0.10-158379-Win.exe
+
+Step 1 - Installing Virtual Box:
+First, we have to download the virtual box installer from the official website. Then, run the installer setup and install it on our computer at the desired folder location. During the installation wizard setup, the user needs to click 'Next' to proceed through the configuration steps until the installation is complete.

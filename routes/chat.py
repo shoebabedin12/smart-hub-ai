@@ -1,40 +1,46 @@
 from flask import Blueprint, request, jsonify
-from services.embedder import embed
+from services.embedder import embed  # 🎯 এটি যেন আমাদের নতুন get_model() কেই কল করে
 from services.faiss_store import search
-import numpy as np
+# আপনার জেমিনি বা এলএলএম সার্ভিসের ইম্পোর্ট
 
 chat_bp = Blueprint('chat', __name__)
 
 @chat_bp.route('/chat', methods=['POST'])
 def chat():
-    data    = request.get_json()
-    message = data.get('message', '').strip()
+    data = request.get_json()
+    user_message = data.get('message', '')
 
-    if not message:
-        return jsonify({'error': 'message required'}), 400
+    if not user_message:
+        return jsonify({'error': 'Message is required'}), 400
 
     try:
-        # Embed the question
-        query_embedding = embed([message])
+        # ১. চ্যাটের প্রশ্নটিকে নতুন বহুভাষী মডেল দিয়ে এম্বেড করা (৭৬৮ ডাইমেনশন)
+        query_vector = embed([user_message]) 
 
-        # Search FAISS
-        results = search(query_embedding, top_k=3)
+        # ২. FAISS ইনডেক্সে মিল খুঁজে বের করা
+        raw_results = search(query_vector)
 
-        if not results:
+        if not raw_results:
+            # যদি FAISS-এ কোনো ম্যাচ না পায়
             return jsonify({
-                'answer': "I couldn't find relevant information in the academic documents. Please ask your faculty or check the resource library.",
+                'answer': "Sorry, I couldn't find an answer in the academic documents.",
                 'source_resource_id': None
             })
 
-        # Build answer from top chunks
-        top_chunks = [r['chunk_text'] for r in results]
-        answer = '\n\n'.join(top_chunks)
-        source_resource_id = int(results[0]['resource_id']) if results[0]['resource_id'] else None
+        # ৩. সবচেয়ে কাছের ম্যাচিং টেক্সটটি নেওয়া
+        best_match = raw_results[0]
+        context_text = best_match['chunk_text']
+        source_id = best_match['resource_id'] # এটিই আমাদের MySQL-এর আইডি ১০
+
+        # ৪. জেমিনি বা আপনার এলএলএম-কে কনটেক্সট সহ প্রম্পট পাঠানো (যদি জেমিনি দিয়ে জেনারেট করান)
+        # অথবা সরাসরি টেক্সট রিটার্ন করা:
+        answer = f"According to the document:\n{context_text}"
 
         return jsonify({
             'answer': answer,
-            'source_resource_id': source_resource_id
+            'source_resource_id': source_id
         })
 
     except Exception as e:
+        print(f"🎯 Actual Python Chat Error: {str(e)}") # টার্মিনালে আসল এরর প্রিন্ট হবে
         return jsonify({'error': str(e)}), 500
