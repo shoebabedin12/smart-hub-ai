@@ -7,3 +7,4 @@ faiss-cpu
 pymupdf
 python-docx
 gunicorn
+python-dotenv
