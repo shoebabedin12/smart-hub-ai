@@ -5,7 +5,7 @@ from services.faiss_store import search
 
 chat_bp = Blueprint('chat', __name__)
 
-@chat_bp.route('/chat', methods=['POST'])
+@chat_bp.route('/', methods=['POST'])
 def chat():
     data = request.get_json()
     user_message = data.get('message', '')
