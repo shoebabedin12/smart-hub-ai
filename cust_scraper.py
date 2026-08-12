@@ -233,7 +233,7 @@ def insert_demo_notices(conn):
          "general", "Computer Science & Engineering", False),
 
         ("Assignment Deadline Extended — Data Structures",
-         "The submission deadline for the Data Structures (CSE 2101) assignment has been extended to May 18, 2026. Students must submit via the Smart Hub Resource Portal. Late submissions will not be accepted.",
+         "The submission deadline for the Data Structures (CSE 2101) assignment has been extended to May 18, 2026. Students must submit via the Student Portal Resource Portal. Late submissions will not be accepted.",
          "assignment", "Computer Science & Engineering", False),
 
         ("Lab Booking System Update",

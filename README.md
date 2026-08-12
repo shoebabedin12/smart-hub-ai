@@ -1,5 +1,5 @@
 ---
-title: Smart Hub Db
+title: Student Portal AI
 emoji: 🐳
 colorFrom: blue
 colorTo: indigo
