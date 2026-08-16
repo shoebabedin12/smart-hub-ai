@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from services.embedder import embed  # 🎯 এটি যেন আমাদের নতুন get_model() কেই কল করে
 from services.faiss_store import search
-# আপনার জেমিনি বা এলএলএম সার্ভিসের ইম্পোর্ট
+from services.gemini import answer_question
 
 chat_bp = Blueprint('chat', __name__)
 
@@ -14,27 +14,30 @@ def chat():
         return jsonify({'error': 'Message is required'}), 400
 
     try:
-        # ১. চ্যাটের প্রশ্নটিকে নতুন বহুভাষী মডেল দিয়ে এম্বেড করা (৭৬৮ ডাইমেনশন)
-        query_vector = embed([user_message]) 
+        # ১. চ্যাটের প্রশ্নটিকে নতুন বহুভাষী মডেল দিয়ে এম্বেড করা (৭৬৮ ডাইমেনশন)
+        query_vector = embed([user_message])
 
         # ২. FAISS ইনডেক্সে মিল খুঁজে বের করা
         raw_results = search(query_vector)
 
         if not raw_results:
-            # যদি FAISS-এ কোনো ম্যাচ না পায়
+            # যদি FAISS-এ কোনো ম্যাচ না পায়
             return jsonify({
                 'answer': "Sorry, I couldn't find an answer in the academic documents.",
                 'source_resource_id': None
             })
 
-        # ৩. সবচেয়ে কাছের ম্যাচিং টেক্সটটি নেওয়া
-        best_match = raw_results[0]
-        context_text = best_match['chunk_text']
-        source_id = best_match['resource_id'] # এটিই আমাদের MySQL-এর আইডি ১০
+        # ৩. সবচেয়ে কাছের কয়েকটি ম্যাচিং চাঙ্ক একসাথে কনটেক্সট হিসেবে নেওয়া
+        top_matches = raw_results[:3]
+        context_text = "\n\n---\n\n".join(m['chunk_text'] for m in top_matches)
+        source_id = top_matches[0]['resource_id'] # এটিই আমাদের MySQL-এর আইডি
 
-        # ৪. জেমিনি বা আপনার এলএলএম-কে কনটেক্সট সহ প্রম্পট পাঠানো (যদি জেমিনি দিয়ে জেনারেট করান)
-        # অথবা সরাসরি টেক্সট রিটার্ন করা:
-        answer = f"According to the document:\n{context_text}"
+        # ৪. জেমিনিকে কনটেক্সট সহ প্রশ্নটি পাঠিয়ে একটি সরাসরি, স্বাভাবিক উত্তর তৈরি করানো
+        answer = answer_question(user_message, context_text)
+
+        # জেমিনি ব্যর্থ হলে (যেমন API quota/key সমস্যা) raw chunk টাই fallback হিসেবে ফেরত দেওয়া
+        if not answer:
+            answer = f"According to the document:\n{top_matches[0]['chunk_text']}"
 
         return jsonify({
             'answer': answer,
